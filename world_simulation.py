@@ -28,7 +28,7 @@ def init_maze(maze, size):
     while wump_x == 0 and wump_y == 0:
         wump_x = randint(0, size - 1)
         wump_y = randint(0, size - 1)
-        
+    
         if wump_x != 0 or wump_y != 0:
             maze[wump_y][wump_x].empty = False
             maze[wump_y][wump_x].wumpus = 2
@@ -48,14 +48,14 @@ def init_maze(maze, size):
         for pit_x in range(size):
             if pit_y == 0 and pit_x == 0:
                 continue
-                
+    
             test_int = randint(1, 10)
-            
+    
             # Test if the spot is within the 20% margin
             if test_int < 3 and maze[pit_y][pit_x].empty:
                 maze[pit_y][pit_x].empty = False
                 maze[pit_y][pit_x].pit = 2
-                
+    
                 # Set spots around pit to breezy
                 # Set spots around wumpus to smelly
                 if pit_x - 1 >= 0:
@@ -83,31 +83,69 @@ def print_maze(maze, agent):
                 print('_', end = ' ')
         
         print('\n')
+
+
+def path_to_victory(maze, stack, agent):
+    
+    while (agent.current_x, agent.current_y) != (0, 0):
+        print_maze(maze, agent)
+        print('---------------------')
+        current_spot = stack.pop()
+        agent.current_x = current_spot.x_coord
+        agent.current_y = current_spot.y_coord
+    
+    print_maze(maze, agent)
+    print('YOU HAVE FOUND THE PATH TO VICTORYYYYYYYY!!!!!')
+    print('+1000000000000 points')
         
 
 def simulate_world(maze):
-    agent = Agent(len(maze))
-    current_x = agent.current_x
-    current_y = agent.current_y
-    agent.knowledge[current_y][current_x].ok = True
     
-    while not agent.dead:
-        agent.update_knowledge(maze[current_y][current_x])
-        
-        if agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].ok and not agent.knowledge[agent.current_y][agent.current_x - 1].visited:
-            agent.current_x = agent.current_x - 1
-        
-        elif agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].ok and not agent.knowledge[agent.current_y - 1][agent.current_x].visited:
-            agent.current_y = agent.current_y - 1
-            
-        elif agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].ok and not agent.knowledge[agent.current_y][agent.current_x + 1].visited:
-            agent.current_x = agent.current_x + 1
-        
-        elif agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].ok and not agent.knowledge[agent.current_y + 1][agent.current_x].visited:
-            agent.current_y = agent.current_y + 1
-        
+    stack = []
+    
+    agent = Agent(len(maze))
+    start_x = agent.current_x
+    start_y = agent.current_y
+    agent.knowledge[agent.current_y][agent.current_x].ok = True
+    stack.append(maze[agent.current_y][agent.current_x])
+    
+    while not agent.dead and not agent.has_gold:
         print_maze(maze, agent)
-        return
+        print('---------------------')
+        agent.update_knowledge(maze[agent.current_y][agent.current_x])
+
+        if maze[agent.current_y][agent.current_x].gold:
+            agent.has_gold = True
+            maze[agent.current_y][agent.current_x].gold = False
+            path_to_victory(maze, stack, agent)
+            break
+            
+        else:
+            if (agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].ok) and not agent.knowledge[agent.current_y][agent.current_x - 1].visited:
+                agent.current_x = agent.current_x - 1
+                stack.append(maze[agent.current_y][agent.current_x])
+            
+            elif (agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].ok) and not agent.knowledge[agent.current_y - 1][agent.current_x].visited:
+                agent.current_y = agent.current_y - 1
+                stack.append(maze[agent.current_y][agent.current_x])
+                
+            elif (agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].ok) and not agent.knowledge[agent.current_y][agent.current_x + 1].visited:
+                agent.current_x = agent.current_x + 1
+                stack.append(maze[agent.current_y][agent.current_x])
+            
+            elif (agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].ok) and not agent.knowledge[agent.current_y + 1][agent.current_x].visited:
+                agent.current_y = agent.current_y + 1
+                stack.append(maze[agent.current_y][agent.current_x])
+            
+            else:
+                current_spot = stack.pop()
+                agent.current_y = current_spot.y_coord
+                agent.current_x = current_spot.x_coord
+        
+        if not stack:
+            agent.dead = True
+            print_maze(maze, agent)
+            print('-------------------')
     
     
 def main():

@@ -3,6 +3,9 @@ class Spot:
     
     # Constructor with sensors present in the spot, with 0 = not in, 1 = maybe in, 2 = yes in
     def __init__(self, x_coord, y_coord, empty=True, gold=False, wumpus=0, pit=0, breeze=False, stench=False):
+        self.x_coord = x_coord
+        self.y_coord = y_coord
+        
         self.empty = empty
         self.gold = gold
         self.wumpus = wumpus

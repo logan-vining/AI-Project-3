@@ -29,7 +29,7 @@ class Agent:
         
         
     def update_knowledge(self, spot):
-        spot.visited = True
+        self.knowledge[spot.y_coord][spot.x_coord].visited = True
         x = self.current_x
         y = self.current_y
         
