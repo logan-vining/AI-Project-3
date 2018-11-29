@@ -22,10 +22,7 @@ class Agent:
         self.dead = dead
         self.has_gold = False
 
-        # Var with values 0 = wumpus location unknown and alive
-        # 1 = Wumpus location known and alive
-        # 2 = Wumpus location known and dead
-        self.knows_wumpus = 0
+        self.wumpus_dead = False
 
 
     def update_knowledge(self, spot):
