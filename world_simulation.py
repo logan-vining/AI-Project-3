@@ -1,6 +1,7 @@
 from Spot import Spot
 from Agent import Agent
 from random import randint
+import heapq
 
 # Helper function that creates the wumpus world based on the provided maze size
 def init_maze(maze, size):
@@ -99,15 +100,13 @@ def path_to_victory(maze, stack, agent):
     print('+1000000000000 points')
         
 
-def simulate_world(maze):
+def safe_simulate(maze):
     
-    stack = []
+    safe_stack = []
     
     agent = Agent(len(maze))
-    start_x = agent.current_x
-    start_y = agent.current_y
     agent.knowledge[agent.current_y][agent.current_x].ok = True
-    stack.append(maze[agent.current_y][agent.current_x])
+    safe_stack.append(maze[agent.current_y][agent.current_x])
     
     while not agent.dead and not agent.has_gold:
         print_maze(maze, agent)
@@ -117,35 +116,46 @@ def simulate_world(maze):
         if maze[agent.current_y][agent.current_x].gold:
             agent.has_gold = True
             maze[agent.current_y][agent.current_x].gold = False
-            path_to_victory(maze, stack, agent)
+            path_to_victory(maze, safe_stack, agent)
             break
             
         else:
             if (agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].ok) and not agent.knowledge[agent.current_y][agent.current_x - 1].visited:
                 agent.current_x = agent.current_x - 1
-                stack.append(maze[agent.current_y][agent.current_x])
+                safe_stack.append(maze[agent.current_y][agent.current_x])
             
             elif (agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].ok) and not agent.knowledge[agent.current_y - 1][agent.current_x].visited:
                 agent.current_y = agent.current_y - 1
-                stack.append(maze[agent.current_y][agent.current_x])
+                safe_stack.append(maze[agent.current_y][agent.current_x])
                 
             elif (agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].ok) and not agent.knowledge[agent.current_y][agent.current_x + 1].visited:
                 agent.current_x = agent.current_x + 1
-                stack.append(maze[agent.current_y][agent.current_x])
+                safe_stack.append(maze[agent.current_y][agent.current_x])
             
             elif (agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].ok) and not agent.knowledge[agent.current_y + 1][agent.current_x].visited:
                 agent.current_y = agent.current_y + 1
-                stack.append(maze[agent.current_y][agent.current_x])
+                safe_stack.append(maze[agent.current_y][agent.current_x])
             
             else:
-                current_spot = stack.pop()
+                current_spot = safe_stack.pop()
                 agent.current_y = current_spot.y_coord
                 agent.current_x = current_spot.x_coord
         
-        if not stack:
-            agent.dead = True
-            print_maze(maze, agent)
-            print('-------------------')
+        if not safe_stack:
+            risky_simulate(maze)
+
+        
+def risky_simulate(maze):
+    
+    risky_path = []
+    
+    for x in range(len(maze)):
+        for y in range(len(maze)):
+            total_count = maze[y][x].wumpus_count + maze[y][x].pit_count
+            if total_count > 0:
+                heapq.heappush(risky_queue, total_count, maze[y][x])
+                
+    
     
     
 def main():
@@ -186,7 +196,7 @@ def main():
             print('Invalid input!')
             print()
     
-    simulate_world(maze)
+    safe_simulate(maze)
     
     
 main()
