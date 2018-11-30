@@ -212,26 +212,31 @@ def search_board(maze):
 
         if ((agent.current_x - 1 >= 0) and not agent.knowledge[agent.current_y][agent.current_x - 1].visited):
             if (maze[agent.current_y][agent.current_x - 1] not in next_spots):
+                #print('Added left')
                 next_spots.append(maze[agent.current_y][agent.current_x - 1])
 
         if ((agent.current_y - 1 >= 0) and not agent.knowledge[agent.current_y - 1][agent.current_x].visited):
             if (maze[agent.current_y - 1][agent.current_x] not in next_spots):
+                #print('Added top')
                 next_spots.append(maze[agent.current_y - 1][agent.current_x])
 
         if ((agent.current_x + 1 < len(maze)) and not agent.knowledge[agent.current_y][agent.current_x + 1].visited):
             if (maze[agent.current_y][agent.current_x + 1] not in next_spots):
+                #print('Added right')
                 next_spots.append(maze[agent.current_y][agent.current_x + 1])
 
         if ((agent.current_y + 1 < len(maze)) and not agent.knowledge[agent.current_y + 1][agent.current_x].visited):
             if (maze[agent.current_y + 1][agent.current_x] not in next_spots):
+                #print('Added bottom')
                 next_spots.append(maze[agent.current_y + 1][agent.current_x])
 
         #print(next_spots)
         if not agent.wumpus_dead:
-            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].total_risk, (abs(x.x_coord - agent.current_x) + abs( (-x.y_coord) - (-agent.current_y)))))
+            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].total_risk, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
         elif agent.wumpus_dead:
-            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].pit_count, (abs(x.x_coord - agent.current_x) + abs( (-x.y_coord) - (-agent.current_y)))))
-        #print(next_spots)
+            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].pit_count, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
+        # for x in next_spots:
+        #     print('Spot: ' + str(x.x_coord) + ', ' + str(x.y_coord) + ' has total_risk of: ' + str(agent.knowledge[x.y_coord][x.x_coord].total_risk) + ', with pit count of: ' + str(agent.knowledge[x.y_coord][x.x_coord].pit_count) + ', with wumpus count of: ' + str(agent.knowledge[x.y_coord][x.x_coord].wumpus_count))
 
         #Check if the next spot is adjacent
         if (((next_spots[0].x_coord == agent.current_x) and (next_spots[0].y_coord == agent.current_y + 1))
