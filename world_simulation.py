@@ -5,10 +5,7 @@ import heapq
 
 # Helper function that creates the wumpus world based on the provided maze size
 def init_maze(maze, size):
-    
-    # Temp list to hold new spots that are added to the maze
     temp_list = []
-    
     # Create an empty maze that is the given size
     for y in range(size):
         for x in range(size):
@@ -88,7 +85,7 @@ def print_maze(maze, agent):
 
         print('\n')
 
-# Helper function that moves the agent back to the start to leave once he gets the gold
+
 def path_to_victory(maze, agent):
 
     agent.current_x = 0
@@ -98,36 +95,75 @@ def path_to_victory(maze, agent):
     print_maze(maze, agent)
     print("Agent, leave the dungeon now and rest. You've earned it!")
 
-# Helper function that calculates the cost to move between spaces
-def move_points(maze, agent, points):
-    
-    
 
-# Main function that processes the spot the agent moved into and calculates points
-def process_move(maze, agent, points):
-    
-    # Check if agent ran into live wumpus
+# def safe_simulate(maze):
+#
+#     safe_stack = []
+#
+#     agent = Agent(len(maze))
+#     agent.knowledge[agent.current_y][agent.current_x].ok = True
+#     safe_stack.append(maze[agent.current_y][agent.current_x])
+#
+#     while not agent.dead and not agent.has_gold:
+#         print_maze(maze, agent)
+#         print('---------------------')
+#         agent.update_knowledge(maze[agent.current_y][agent.current_x])
+#
+#         if maze[agent.current_y][agent.current_x].gold:
+#             agent.has_gold = True
+#             maze[agent.current_y][agent.current_x].gold = False
+#             path_to_victory(maze, safe_stack, agent)
+#             break
+#
+#         else:
+#             if (agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].ok) and not agent.knowledge[agent.current_y][agent.current_x - 1].visited:
+#                 agent.current_x = agent.current_x - 1
+#                 safe_stack.append(maze[agent.current_y][agent.current_x])
+#
+#             elif (agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].ok) and not agent.knowledge[agent.current_y - 1][agent.current_x].visited:
+#                 agent.current_y = agent.current_y - 1
+#                 safe_stack.append(maze[agent.current_y][agent.current_x])
+#
+#             elif (agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].ok) and not agent.knowledge[agent.current_y][agent.current_x + 1].visited:
+#                 agent.current_x = agent.current_x + 1
+#                 safe_stack.append(maze[agent.current_y][agent.current_x])
+#
+#             elif (agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].ok) and not agent.knowledge[agent.current_y + 1][agent.current_x].visited:
+#                 agent.current_y = agent.current_y + 1
+#                 safe_stack.append(maze[agent.current_y][agent.current_x])
+#
+#             else:
+#                 current_spot = safe_stack.pop()
+#                 agent.current_y = current_spot.y_coord
+#                 agent.current_x = current_spot.x_coord
+#
+#         if not safe_stack:
+#             risky_simulate(maze)
+#
+#
+# def risky_simulate(maze):
+#
+#     risky_path = []
+#
+#     for x in range(len(maze)):
+#         for y in range(len(maze)):
+#             total_count = maze[y][x].wumpus_count + maze[y][x].pit_count
+#             if total_count > 0:
+#                 heapq.heappush(risky_queue, total_count, maze[y][x])
+
+def process_move(maze, agent):
     if maze[agent.current_y][agent.current_x].wumpus == 2:
         print('Agent eviscerated by the Wumpus!')
         agent.dead = True
-        points = points - 1000
-
-    # Then check if agent fell into a pit
     elif maze[agent.current_y][agent.current_x].pit == 2:
         print('Agent tripped and fell to their demise!')
         agent.dead = True
-        points = points - 1000
-        
-    # Then check if the agent found the gold and pick it up
     elif maze[agent.current_y][agent.current_x].gold:
         print('Agent retrieved the gold!')
         agent.has_gold = True
-        points = points + 1000
-        
-    # Finally check if the agent deduced where the wumpus is
+
     if (agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
-        points = points - 10
         print('Agent shot arrow!')
         if maze[agent.current_y][agent.current_x - 1].wumpus == 2:
             maze[agent.current_y][agent.current_x - 1].wumpus = 0
@@ -138,7 +174,6 @@ def process_move(maze, agent, points):
     elif (agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
-        points = points - 10
         if maze[agent.current_y - 1][agent.current_x].wumpus == 2:
             maze[agent.current_y - 1][agent.current_x].wumpus = 0
             maze[agent.current_y - 1][agent.current_x].stench = True
@@ -148,7 +183,6 @@ def process_move(maze, agent, points):
     elif (agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
-        points = points - 10
         if maze[agent.current_y][agent.current_x + 1].wumpus == 2:
             maze[agent.current_y][agent.current_x + 1].wumpus = 0
             maze[agent.current_y][agent.current_x + 1].stench = True
@@ -158,34 +192,24 @@ def process_move(maze, agent, points):
     elif (agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
-        points = points - 10
         if maze[agent.current_y + 1][agent.current_x].wumpus == 2:
             maze[agent.current_y + 1][agent.current_x].wumpus = 0
             maze[agent.current_y + 1][agent.current_x].stench = True
             agent.wumpus_dead = True
             print('Wumpus killed!')
 
-    print('points = ' + str(points))
 
-# Main function that simulates the agent moving throughout the maze
 def search_board(maze):
-    points = 0
     next_spots = []
-    
-    # First make the agent and place him in the start spot
+    #customObjects.sort(key=lambda x: x.date)
     agent = Agent(len(maze))
     agent.knowledge[agent.current_y][agent.current_x].ok = True
 
     print('---------------------')
     print_maze(maze, agent)
-    
-    # Continue moving through the maze until the agent dies or found the gold
     while not agent.dead and not agent.has_gold:
-        
-        # Update the KB of the agent
         agent.update_knowledge(maze[agent.current_y][agent.current_x])
 
-        # Check surrounding spaces for the least risky spot
         if ((agent.current_x - 1 >= 0) and not agent.knowledge[agent.current_y][agent.current_x - 1].visited):
             if (maze[agent.current_y][agent.current_x - 1] not in next_spots):
                 next_spots.append(maze[agent.current_y][agent.current_x - 1])
@@ -202,13 +226,12 @@ def search_board(maze):
             if (maze[agent.current_y + 1][agent.current_x] not in next_spots):
                 next_spots.append(maze[agent.current_y + 1][agent.current_x])
 
-        # If the agent knows the wumpus isn't dead, find the least riskiest spot based on wumpus and pits
+        #print(next_spots)
         if not agent.wumpus_dead:
             next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].total_risk, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
-        
-        # If the agent knows the wumpus is dead, find the least riskiest spot based on pits only
         elif agent.wumpus_dead:
             next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].pit_count, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
+        #print(next_spots)
 
         #Check if the next spot is adjacent
         if (((next_spots[0].x_coord == agent.current_x) and (next_spots[0].y_coord == agent.current_y + 1))
@@ -223,6 +246,7 @@ def search_board(maze):
             agent.current_y = next_spots[0].y_coord
 
             next_spots.pop(0)
+            #print(next_spots)
 
         # Do a search for the cost to the next spot
         else:
@@ -231,11 +255,10 @@ def search_board(maze):
 
             next_spots.pop(0)
 
-        process_move(maze, agent, points)
+        process_move(maze, agent)
 
         print('---------------------')
         print_maze(maze, agent)
-
 
     if agent.has_gold:
         path_to_victory(maze, agent)
