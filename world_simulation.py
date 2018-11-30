@@ -151,19 +151,24 @@ def path_to_victory(maze, agent):
 #             if total_count > 0:
 #                 heapq.heappush(risky_queue, total_count, maze[y][x])
 
-def process_move(maze, agent):
+def process_move(maze, agent, points):
     if maze[agent.current_y][agent.current_x].wumpus == 2:
         print('Agent eviscerated by the Wumpus!')
         agent.dead = True
+        points = points - 1000
+
     elif maze[agent.current_y][agent.current_x].pit == 2:
         print('Agent tripped and fell to their demise!')
         agent.dead = True
+        points = points - 1000
     elif maze[agent.current_y][agent.current_x].gold:
         print('Agent retrieved the gold!')
         agent.has_gold = True
+        points = points + 1000
 
     if (agent.current_x - 1 >= 0 and agent.knowledge[agent.current_y][agent.current_x - 1].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
+        points = points - 10
         print('Agent shot arrow!')
         if maze[agent.current_y][agent.current_x - 1].wumpus == 2:
             maze[agent.current_y][agent.current_x - 1].wumpus = 0
@@ -174,6 +179,7 @@ def process_move(maze, agent):
     elif (agent.current_y - 1 >= 0 and agent.knowledge[agent.current_y - 1][agent.current_x].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
+        points = points - 10
         if maze[agent.current_y - 1][agent.current_x].wumpus == 2:
             maze[agent.current_y - 1][agent.current_x].wumpus = 0
             maze[agent.current_y - 1][agent.current_x].stench = True
@@ -183,6 +189,7 @@ def process_move(maze, agent):
     elif (agent.current_x + 1 < len(maze) and agent.knowledge[agent.current_y][agent.current_x + 1].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
+        points = points - 10
         if maze[agent.current_y][agent.current_x + 1].wumpus == 2:
             maze[agent.current_y][agent.current_x + 1].wumpus = 0
             maze[agent.current_y][agent.current_x + 1].stench = True
@@ -192,14 +199,17 @@ def process_move(maze, agent):
     elif (agent.current_y + 1 < len(maze) and agent.knowledge[agent.current_y + 1][agent.current_x].wumpus_count == 3 and agent.arrow):
         agent.arrow = False
         print('Agent shot arrow!')
+        points = points - 10
         if maze[agent.current_y + 1][agent.current_x].wumpus == 2:
             maze[agent.current_y + 1][agent.current_x].wumpus = 0
             maze[agent.current_y + 1][agent.current_x].stench = True
             agent.wumpus_dead = True
             print('Wumpus killed!')
 
+    print('points = ' + str(points))
 
 def search_board(maze):
+    points = 0
     next_spots = []
     #customObjects.sort(key=lambda x: x.date)
     agent = Agent(len(maze))
@@ -255,10 +265,11 @@ def search_board(maze):
 
             next_spots.pop(0)
 
-        process_move(maze, agent)
+        process_move(maze, agent, points)
 
         print('---------------------')
         print_maze(maze, agent)
+
 
     if agent.has_gold:
         path_to_victory(maze, agent)

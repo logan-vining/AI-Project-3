@@ -13,7 +13,7 @@ class Spot:
         self.breeze = breeze
         self.stench = stench
         self.ok = False
-
+        
         self.total_risk = 0
         self.wumpus_count = 0
         self.pit_count = 0

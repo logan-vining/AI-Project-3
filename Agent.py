@@ -21,8 +21,13 @@ class Agent:
         self.arrow = arrow
         self.dead = dead
         self.has_gold = False
-
+        
         self.wumpus_dead = False
+
+        # Var with values 0 = wumpus location unknown and alive
+        # 1 = Wumpus location known and alive
+        # 2 = Wumpus location known and dead
+        self.knows_wumpus = 0
 
 
     def update_knowledge(self, spot):
@@ -35,55 +40,43 @@ class Agent:
                 self.knowledge[y][x - 1].ok = True
                 self.knowledge[y][x - 1].wumpus_count = 0
                 self.knowledge[y][x - 1].pit_count = 0
-                self.knowledge[y][x - 1].update_risk()
             if y - 1 >= 0:
                 self.knowledge[y - 1][x].ok = True
                 self.knowledge[y - 1][x].wumpus_count = 0
                 self.knowledge[y - 1][x].pit_count = 0
-                self.knowledge[y - 1][x].update_risk()
             if x + 1 < len(self.knowledge):
                 self.knowledge[y][x + 1].ok = True
                 self.knowledge[y][x + 1].wumpus_count = 0
                 self.knowledge[y][x + 1].pit_count = 0
-                self.knowledge[y][x + 1].update_risk()
             if y + 1 < len(self.knowledge):
                 self.knowledge[y + 1][x].ok = True
                 self.knowledge[y + 1][x].wumpus_count = 0
                 self.knowledge[y + 1][x].pit_count = 0
-                self.knowledge[y + 1][x].update_risk()
 
         if spot.stench:
             if x - 1 >= 0 and not self.knowledge[y][x - 1].ok:
                 self.knowledge[y][x - 1].wumpus = 1
                 self.knowledge[y][x - 1].wumpus_count += 1
-                self.knowledge[y][x - 1].update_risk()
             if y - 1 >= 0 and not self.knowledge[y - 1][x].ok:
                 self.knowledge[y - 1][x].wumpus = 1
-                self.knowledge[y - 1][x].wumpus_count += 1
-                self.knowledge[y - 1][x].update_risk()
+                self.knowledge[y][x - 1].wumpus_count += 1
             if x + 1 < len(self.knowledge) and not self.knowledge[y][x + 1].ok:
                 self.knowledge[y][x + 1].wumpus = 1
-                self.knowledge[y][x + 1].wumpus_count += 1
-                self.knowledge[y][x + 1].update_risk()
+                self.knowledge[y][x - 1].wumpus_count += 1
             if y + 1 < len(self.knowledge) and not self.knowledge[y + 1][x].ok:
                 self.knowledge[y + 1][x].wumpus = 1
-                self.knowledge[y + 1][x].wumpus_count += 1
-                self.knowledge[y + 1][x].update_risk()
+                self.knowledge[y][x - 1].wumpus_count += 1
 
         if spot.breeze:
             if x - 1 >= 0 and not self.knowledge[y][x - 1].ok:
                 self.knowledge[y][x - 1].pit = 1
                 self.knowledge[y][x - 1].pit_count += 1
-                self.knowledge[y][x - 1].update_risk()
             if y - 1 >= 0 and not self.knowledge[y - 1][x].ok:
-                self.knowledge[y - 1][x].pit = 1
-                self.knowledge[y - 1][x].pit_count += 1
-                self.knowledge[y - 1][x].update_risk()
+                self.knowledge[y][x - 1].pit = 1
+                self.knowledge[y][x - 1].pit_count += 1
             if x + 1 < len(self.knowledge) and not self.knowledge[y][x + 1].ok:
                 self.knowledge[y][x + 1].pit = 1
                 self.knowledge[y][x + 1].pit_count += 1
-                self.knowledge[y][x + 1].update_risk()
             if y + 1 < len(self.knowledge) and not self.knowledge[y + 1][x].ok:
-                self.knowledge[y + 1][x].pit = 1
-                self.knowledge[y + 1][x].pit_count += 1
-                self.knowledge[y + 1][x].update_risk()
+                self.knowledge[y][x - 1].pit = 1
+                self.knowledge[y][x - 1].pit_count += 1
