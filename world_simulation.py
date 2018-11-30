@@ -228,9 +228,9 @@ def search_board(maze):
 
         #print(next_spots)
         if not agent.wumpus_dead:
-            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].total_risk, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
+            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].total_risk, (abs(x.x_coord - agent.current_x) + abs( (-x.y_coord) - (-agent.current_y)))))
         elif agent.wumpus_dead:
-            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].pit_count, (abs(x.x_coord - agent.current_x) + abs(x.y_coord - agent.current_y))))
+            next_spots.sort(key = lambda x: (agent.knowledge[x.y_coord][x.x_coord].pit_count, (abs(x.x_coord - agent.current_x) + abs( (-x.y_coord) - (-agent.current_y)))))
         #print(next_spots)
 
         #Check if the next spot is adjacent
