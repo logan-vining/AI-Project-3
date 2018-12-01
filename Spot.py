@@ -18,6 +18,7 @@ class Spot:
         self.wumpus_count = 0
         self.pit_count = 0
         self.visited = False
+        self.checked = False
 
     def update_risk(self):
         self.total_risk = self.wumpus_count + self.pit_count
